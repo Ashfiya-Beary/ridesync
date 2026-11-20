@@ -22,4 +22,39 @@ stops.forEach(function (stop) {
 });
 
 // Zoom the map so all pins are visible
-map.fitBounds(stops.map(function (stop) { return [stop.lat, stop.lng]; }));
+map.fitBounds(stops.map(function (stop) { return [stop.lat, stop.lng]; })); 
+
+// ---- Step 2: a fake bus that moves along the stops ----
+
+// The bus is a red dot. We start it at the first stop.
+const busMarker = L.circleMarker([stops[0].lat, stops[0].lng], {
+  radius: 10,
+  color: "red",
+  fillColor: "red",
+  fillOpacity: 1,
+}).addTo(map);
+busMarker.bindTooltip("Bus 1", { permanent: true, direction: "top" });
+
+let stopIndex = 0;  // the stop the bus is leaving now
+let step = 0;       // which small step we are on
+const STEPS = 20;   // how many small steps between two stops
+
+function moveBus() {
+  const from = stops[stopIndex];
+  const to = stops[(stopIndex + 1) % stops.length];
+  const fraction = step / STEPS;  // 0 means at "from", 1 means at "to"
+
+  // Find the point between the two stops
+  const lat = from.lat + (to.lat - from.lat) * fraction;
+  const lng = from.lng + (to.lng - from.lng) * fraction;
+  busMarker.setLatLng([lat, lng]);
+
+  step = step + 1;
+  if (step > STEPS) {
+    step = 0;
+    stopIndex = (stopIndex + 1) % stops.length;  // go to the next stop
+  }
+}
+
+// Run moveBus every 500 milliseconds (half a second)
+setInterval(moveBus, 500);
