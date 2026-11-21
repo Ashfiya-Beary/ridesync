@@ -1,5 +1,5 @@
 // Where the stops come from. Now: a file. Later: our Flask server.
-const STOPS_URL = "stops.json";
+const STOPS_URL = "http://127.0.0.1:5000/api/stops";
 
 // Make the map first. The pins come after the stops arrive.
 const map = L.map("map").setView([13.0680, 74.9950], 15);
