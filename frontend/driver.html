@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RideSync Driver</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            max-width: 400px;
+            margin: 30px auto;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1769e0;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 10px;
+            box-sizing: border-box;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        input, select {
+            border: 1px solid #ccc;
+        }
+
+        button {
+            border: none;
+            background: #1769e0;
+            color: white;
+            font-weight: bold;
+        }
+
+        .stop {
+            background: #dc3545;
+        }
+
+        #status {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>RideSync Driver</h2>
+
+    <label>Bus ID</label>
+    <input type="text" id="busId" placeholder="Enter BUS01">
+
+    <label>Current Bus Location</label>
+
+    <select id="busLocation">
+        <option value="">Select Current Stop</option>
+        <option value="College Gate">College Gate</option>
+        <option value="Hostel">Hostel</option>
+        <option value="Market">Market</option>
+        <option value="Temple Road">Temple Road</option>
+        <option value="Bus Stand">Bus Stand</option>
+    </select>
+
+    <button onclick="updateLocation()">
+        Update Location
+    </button>
+
+    <button class="stop" onclick="stopTracking()">
+        Stop Tracking
+    </button>
+
+    <p id="status">Tracking not started</p>
+
+</div>
+
+<script src="driver.js"></script>
+
+</body>
+</html>
