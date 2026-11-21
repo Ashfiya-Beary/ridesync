@@ -3,36 +3,33 @@ import sqlite3
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
+import logic
+import simulator
 from data import DATABASE_FILE, STOPS
 
 app = Flask(__name__)
 CORS(app)
 
 
-def read_location(bus_id):
+def save_location(bus_id, lat, lng, next_stop_id):
     connection = sqlite3.connect(DATABASE_FILE)
-    connection.row_factory = sqlite3.Row
-
-    location = connection.execute(
+    connection.execute(
         """
-        SELECT bus_id, lat, lng, next_stop_id
-        FROM bus_locations
-        WHERE bus_id = ?
+        INSERT OR REPLACE INTO bus_locations
+        (bus_id, lat, lng, next_stop_id)
+        VALUES (?, ?, ?, ?)
         """,
-        (bus_id,),
-    ).fetchone()
-
+        (bus_id, lat, lng, next_stop_id),
+    )
+    connection.commit()
     connection.close()
 
-    if location is None:
-        return {
-            "bus_id": 1,
-            "lat": 13.0700,
-            "lng": 74.9900,
-            "next_stop_id": 2,
-        }
 
-    return dict(location)
+def find_stop(stop_id):
+    for stop in STOPS:
+        if stop["id"] == stop_id:
+            return stop
+    return None
 
 
 @app.get("/api/stops")
@@ -42,47 +39,84 @@ def get_stops():
 
 @app.get("/api/location/1")
 def get_bus_location():
-    return jsonify(read_location(1))
+    position = simulator.advance()
+
+    save_location(
+        1,
+        position["lat"],
+        position["lng"],
+        position["next_stop_id"],
+    )
+
+    return jsonify({
+        "bus_id": 1,
+        "lat": position["lat"],
+        "lng": position["lng"],
+        "next_stop_id": position["next_stop_id"],
+    })
 
 
 @app.post("/api/location")
 def save_bus_location():
     new_location = request.get_json()
+    next_stop_id = simulator.get_current_position()["next_stop_id"]
 
-    connection = sqlite3.connect(DATABASE_FILE)
-    connection.execute(
-        """
-        INSERT OR REPLACE INTO bus_locations
-        (bus_id, lat, lng, next_stop_id)
-        VALUES (?, ?, ?, ?)
-        """,
-        (
-            new_location["bus_id"],
-            new_location["lat"],
-            new_location["lng"],
-            2,
-        ),
+    save_location(
+        new_location["bus_id"],
+        new_location["lat"],
+        new_location["lng"],
+        next_stop_id,
     )
-    connection.commit()
-    connection.close()
 
     return jsonify({"message": "saved"})
 
 
 @app.get("/api/eta/1/<int:stop_id>")
 def get_eta(stop_id):
+    stop = find_stop(stop_id)
+
+    if stop is None:
+        return jsonify({"error": "Stop not found"}), 404
+
+    position = simulator.get_current_position()
+    minutes = logic.eta_minutes(
+        position["lat"],
+        position["lng"],
+        stop["lat"],
+        stop["lng"],
+    )
+
     return jsonify({
         "stop_id": stop_id,
-        "minutes": 4.5,
+        "minutes": minutes,
     })
 
 
 @app.get("/api/alert/1/<int:stop_id>")
 def get_alert(stop_id):
+    stop = find_stop(stop_id)
+
+    if stop is None:
+        return jsonify({"error": "Stop not found"}), 404
+
+    position = simulator.get_current_position()
+    near = logic.is_near(
+        position["lat"],
+        position["lng"],
+        stop["lat"],
+        stop["lng"],
+    )
+    distance = logic.distance_m(
+        position["lat"],
+        position["lng"],
+        stop["lat"],
+        stop["lng"],
+    )
+
     return jsonify({
         "stop_id": stop_id,
-        "near": True,
-        "distance_m": 180,
+        "near": near,
+        "distance_m": round(distance),
     })
 
 
