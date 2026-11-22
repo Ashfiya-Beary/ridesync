@@ -7,13 +7,22 @@
   <style>
     body { margin: 0; height: 100vh; display: flex; flex-direction: column; font-family: Arial, sans-serif; }
     h1 { margin: 0; padding: 10px; background: #1f4e78; color: white; font-size: 20px; }
+    #main { flex: 1; display: flex; min-height: 0; }
     #map { flex: 1; }
+    #panel { width: 280px; padding: 12px; overflow-y: auto; border-left: 1px solid #ccc; background: #f7f9fb; }
+    #panel select { width: 100%; padding: 6px; margin: 6px 0 12px; }
+    #etaDisplay { font-size: 16px; margin-bottom: 12px; }
+    #alertDisplay { background: #ffe8e8; border-radius: 6px; padding: 0 8px; }
   </style>
 </head>
 <body>
   <h1>RideSync</h1>
-  <div id="map"></div>
+  <div id="main">
+    <div id="map"></div>
+    <div id="panel"></div>
+  </div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="panel-live.js"></script>
   <script src="map.js"></script>
 </body>
 </html>

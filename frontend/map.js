@@ -9,8 +9,8 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
-// The red dot for the bus. It is made when the first location arrives.
-let busMarker = null;
+let busMarker = null;  // the red dot, made when the first location arrives
+let allStops = [];     // the stops, kept for the panel
 
 // Ask the server for the stops. When they arrive, show them and start the bus.
 fetch(SERVER + "/api/stops")
@@ -18,7 +18,9 @@ fetch(SERVER + "/api/stops")
     return response.json();
   })
   .then(function (stops) {
+    allStops = stops;
     showStops(stops);
+    showPanel(allStops, null, null, null);
     startBus();
   })
   .catch(function (error) {
@@ -58,8 +60,31 @@ function updateBus() {
       } else {
         busMarker.setLatLng(point);
       }
+      refreshPanel(location);
     })
     .catch(function (error) {
       console.log("Could not get the bus location", error);
+    });
+}
+
+// Ask the server for the ETA and the alert of the chosen stop, then update the panel.
+function refreshPanel(location) {
+  const stopId = getSelectedStopId();
+
+  if (stopId === null) {
+    showPanel(allStops, location, null, null);
+    return;
+  }
+
+  // Promise.all: ask both questions at the same time, continue when both answers arrive
+  Promise.all([
+    fetch(SERVER + "/api/eta/1/" + stopId).then(function (r) { return r.json(); }),
+    fetch(SERVER + "/api/alert/1/" + stopId).then(function (r) { return r.json(); }),
+  ])
+    .then(function (results) {
+      showPanel(allStops, location, results[0], results[1]);
+    })
+    .catch(function (error) {
+      console.log("Could not get the ETA or alert", error);
     });
 }
