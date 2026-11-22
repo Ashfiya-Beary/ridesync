@@ -21,3 +21,9 @@ How it works: fetch asks for the file, and .then runs when the answer arrives. T
 Why it is needed: In the real project, the server holds the data and the page shows it. This is how the frontend and backend parts of our team connect.
 
 How it works: fetch asks the Flask server at port 5000 for the stops. CORS lets my page at port 8000 talk to it. If the server stops, my page cannot load the stops (I tested this by stopping the server).
+
+ What I built: The red bus on my map now gets its position from the Flask server (/api/location/1), asked every second.
+
+Why it is needed: The server and its simulator decide where the bus is. The page only shows it. This is how the real bus will work later.
+
+How it works: setInterval calls updateBus every second. updateBus uses fetch to ask the server for the location, and moves the red dot with setLatLng. If the server stops, the bus stops moving.
