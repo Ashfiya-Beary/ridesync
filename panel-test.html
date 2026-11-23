@@ -1,0 +1,79 @@
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>RideSync Test</title>
+</head>
+
+<body>
+
+    <h1>RideSync</h1>
+
+    <div id="panel">
+        Loading bus stops...
+    </div>
+
+
+    <script src="panel.js"></script>
+
+    <script>
+
+        // Fake bus stop data
+        const stops = [
+
+            {id: 1, name: "College Gate", lat: 13.0700, lng: 74.9900},
+
+            {id: 2, name: "Hostel", lat: 13.0695, lng: 74.9925},
+
+            {id: 3, name: "Market", lat: 13.0680, lng: 74.9950},
+
+            {id: 4, name: "Temple Road", lat: 13.0665, lng: 74.9975},
+
+            {id: 5, name: "Bus Stand", lat: 13.0650, lng: 75.0000}
+
+        ];
+
+
+        // Fake bus location
+        const busLocation = {
+
+    bus_id: 1,
+    lat: 13.07,
+    lng: 74.99,
+    next_stop_id: 2
+
+};
+
+
+        // Fake ETA data
+        const eta = [
+    {stop_id: 1, minutes: 8},
+    {stop_id: 2, minutes: 4.5},
+    {stop_id: 3, minutes: 6},
+    {stop_id: 4, minutes: 10},
+    {stop_id: 5, minutes: 12}
+];
+
+
+        // Fake alert information
+        const alertInfo = {
+
+            stop_id: 2,
+
+            near: true,
+
+            distance_m: 180
+
+        };
+
+
+        // Call the panel function
+        showPanel(stops, busLocation, eta, alertInfo);
+
+    </script>
+
+</body>
+
+</html>
